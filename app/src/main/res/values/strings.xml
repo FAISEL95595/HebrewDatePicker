@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">hebrewdatepicker</string>
+    <string name="arrowback"><![CDATA[<]]></string>
+    <string name="arrowforward"><![CDATA[>]]></string>
+</resources>
