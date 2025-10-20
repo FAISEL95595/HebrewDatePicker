@@ -76,6 +76,7 @@ class HebrewDatePickerDialog internal constructor(
         loadMonth(currentHebrewMonthCalendar)
 
         btnPrev.setOnClickListener {
+            // **תיקון לוגיקה חודש אחורה:** (כפי שסוכם)
             currentHebrewMonthCalendar.jewishDayOfMonth = 1
             currentHebrewMonthCalendar.back()
             currentHebrewMonthCalendar.jewishDayOfMonth = 1
@@ -94,7 +95,8 @@ class HebrewDatePickerDialog internal constructor(
 
         val hebrewMonthLine = "${HebrewDateUtils.hebrewMonthName(jc.jewishMonth)} ${HebrewDateUtils.hebrewYearToGematria(jc.jewishYear)}"
 
-        val gregorianLine = gregorianCal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) +
+        // **תיקון שגיאת 'String?' (קו 101/129):** הוספת ?: "??" לאחר קריאה ל-getDisplayName
+        val gregorianLine = (gregorianCal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) ?: "??") +
                 " " + gregorianCal.get(Calendar.YEAR)
 
         tvMonthYear.text = "$hebrewMonthLine\n$gregorianLine"
