@@ -3,7 +3,7 @@ package com.faisel.hebrewdatepicker.ui
 import android.app.Dialog
 import android.content.Context
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.GridView
 import android.widget.TextView
 import com.faisel.hebrewdatepicker.R
@@ -42,8 +42,8 @@ class HebrewDatePickerDialog internal constructor(
 
         val tvMonthYear = findViewById<TextView>(R.id.tvMonthYear)
         val gridDays = findViewById<GridView>(R.id.gridDays)
-        val btnPrev = findViewById<Button>(R.id.btnPrevMonth)
-        val btnNext = findViewById<Button>(R.id.btnNextMonth)
+        val btnPrev = findViewById<ImageButton>(R.id.btnPrevMonth)
+        val btnNext = findViewById<ImageButton>(R.id.btnNextMonth)
 
         val gregorianMonthNamesHebrew = mapOf(
             "JANUARY" to "ינואר", "FEBRUARY" to "פברואר", "MARCH" to "מרץ",
