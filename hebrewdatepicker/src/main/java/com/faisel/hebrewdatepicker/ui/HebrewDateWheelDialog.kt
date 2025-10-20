@@ -121,7 +121,7 @@ class HebrewDateWheelDialog internal constructor(
 
     class Builder(private val context: Context) {
         private var outputType: OutputType = OutputType.BOTH
-        private var initialDate: Date = Date() // ברירת מחדל: היום
+        private var initialDate: Date = Date()
         private var onHebrewSelected: ((HebrewDate) -> Unit)? = null
         private var onGregorianSelected: ((LocalDate) -> Unit)? = null
 

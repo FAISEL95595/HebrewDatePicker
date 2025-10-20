@@ -8,11 +8,7 @@ import java.time.ZoneId
 
 object DateConverter {
 
-    /**
-     * ממיר תאריך לועזי לתאריך עברי מדויק באמצעות ספריית KosherJava Zmanim.
-     */
     fun gregorianToHebrew(date: LocalDate): HebrewDate {
-        // המרה מ-java.time.LocalDate ל-java.util.Date
         val instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant()
         val javaDate = Date.from(instant)
 

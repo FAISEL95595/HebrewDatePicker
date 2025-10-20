@@ -4,16 +4,11 @@ import java.lang.StringBuilder
 
 object HebrewDateUtils {
 
-    /**
-     * ממיר את השנה העברית למחרוזת גימטריה (לדוגמה: 5786 -> תשפ"ו)
-     * משתמש רק ב-3 הספרות האחרונות.
-     */
     fun hebrewYearToGematria(year: Int): String {
         var num = year % 1000
         if (num == 0) return ""
 
         val sb = StringBuilder()
-        // ... (הלוגיקה נשארת זהה כפי שסיפקת)
         val hundreds = num - (num % 100)
 
         when (hundreds) {
@@ -29,7 +24,6 @@ object HebrewDateUtils {
         }
 
         if (num > 0) {
-            // מקרה מיוחד: ט"ו (15) וט"ז (16)
             if (num == 15) {
                 sb.append("ט").append("ו")
                 num = 0
@@ -37,7 +31,6 @@ object HebrewDateUtils {
                 sb.append("ט").append("ז")
                 num = 0
             } else {
-                // עשרות רגילות
                 if (num >= 90) { sb.append("צ"); num -= 90 }
                 else if (num >= 80) { sb.append("פ"); num -= 80 }
                 else if (num >= 70) { sb.append("ע"); num -= 70 }
@@ -48,7 +41,6 @@ object HebrewDateUtils {
                 else if (num >= 20) { sb.append("כ"); num -= 20 }
                 else if (num >= 10) { sb.append("י"); num -= 10 }
 
-                // יחידות רגילות
                 if (num >= 9) sb.append("ט")
                 else if (num >= 8) sb.append("ח")
                 else if (num >= 7) sb.append("ז")
@@ -74,9 +66,7 @@ object HebrewDateUtils {
         }
     }
 
-    /**
-     * מחזיר את שם היום העברי (א׳, ב׳, י״ד וכו') לפי יום חודש (1-30).
-     */
+
     fun hebrewDayToGematria(day: Int): String {
         val dayMap = listOf(
             "", "א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ז׳", "ח׳", "ט׳",

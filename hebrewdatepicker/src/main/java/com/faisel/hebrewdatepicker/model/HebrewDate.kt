@@ -4,7 +4,7 @@ import com.faisel.hebrewdatepicker.utils.HebrewDateUtils
 
 data class HebrewDate(
     val day: Int,
-    val month: Int, // מספר החודש לפי KosherJava: 1=Nisan, 7=Tishrei
+    val month: Int,
     val year: Int
 ) {
     val monthName: String
