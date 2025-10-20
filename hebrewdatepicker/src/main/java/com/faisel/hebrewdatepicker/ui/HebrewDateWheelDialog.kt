@@ -86,7 +86,6 @@ class HebrewDateWheelDialog internal constructor(
             tvHeader?.text = "$hebrewLine\n$gregorianLine"
         }
 
-        // הגדרת בוררי שנה וחודש
         val minYear = currentYearHebrew - 10
         val maxYear = currentYearHebrew + 10
         npYear.minValue = minYear
