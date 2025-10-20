@@ -17,7 +17,6 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.Calendar
 
-// *** שינוי קריטי: הקונסטרוקטור שונה מ-private ל-internal ***
 class HebrewDatePickerDialog internal constructor(
     context: Context,
     private val mode: PickerMode,
@@ -46,6 +45,13 @@ class HebrewDatePickerDialog internal constructor(
         val btnPrev = findViewById<Button>(R.id.btnPrevMonth)
         val btnNext = findViewById<Button>(R.id.btnNextMonth)
 
+        val gregorianMonthNamesHebrew = mapOf(
+            "JANUARY" to "ינואר", "FEBRUARY" to "פברואר", "MARCH" to "מרץ",
+            "APRIL" to "אפריל", "MAY" to "מאי", "JUNE" to "יוני",
+            "JULY" to "יולי", "AUGUST" to "אוגוסט", "SEPTEMBER" to "ספטמבר",
+            "OCTOBER" to "אוקטובר", "NOVEMBER" to "נובמבר", "DECEMBER" to "דצמבר"
+        )
+
         fun loadMonth(jc: JewishCalendar) {
             val days = mutableListOf<Pair<LocalDate?, HebrewDate?>>()
 
@@ -62,7 +68,7 @@ class HebrewDatePickerDialog internal constructor(
             }
 
             for (i in 0 until paddingDays) {
-                days.add(Pair(null, null)) // ימי מילוי
+                days.add(Pair(null, null))
             }
 
             val daysInMonth = jc.getDaysInJewishMonth()
@@ -76,10 +82,8 @@ class HebrewDatePickerDialog internal constructor(
                 currentDate = currentDate.plusDays(1)
             }
 
-            // 4. עדכון האדפטר
             val adapter = CalendarAdapter(context, days) { gregorian, hebrew ->
-                // *** לוגיקת בחירת סוג הפלט ***
-                when (outputType) { // משתמשים בפרמטר החדש
+                when (outputType) {
                     OutputType.HEBREW -> onHebrewSelected?.invoke(hebrew)
                     OutputType.GREGORIAN -> onGregorianSelected?.invoke(gregorian)
                     OutputType.BOTH -> {
@@ -91,10 +95,15 @@ class HebrewDatePickerDialog internal constructor(
             }
             gridDays.adapter = adapter
 
-            // 5. הצגת כותרת
             val firstHebrewDateModel = DateConverter.gregorianToHebrew(startGregorianDate)
 
-            tvMonthYear.text = "${firstHebrewDateModel.monthName} ${firstHebrewDateModel.yearGematria} / ${startGregorianDate.month} ${startGregorianDate.year}"
+            val hebrewMonthLine = "${firstHebrewDateModel.monthName} ${firstHebrewDateModel.yearGematria}"
+
+            val gregorianMonthNameEnglish = startGregorianDate.month.name
+            val gregorianMonthHebrew = gregorianMonthNamesHebrew[gregorianMonthNameEnglish] ?: gregorianMonthNameEnglish
+            val gregorianLine = "${gregorianMonthHebrew} ${startGregorianDate.year}"
+
+            tvMonthYear.text = "$hebrewMonthLine\n$gregorianLine"
         }
 
         loadMonth(currentHebrewMonthCalendar)
@@ -116,16 +125,12 @@ class HebrewDatePickerDialog internal constructor(
 
     class Builder(private val context: Context) {
         private var mode: PickerMode = PickerMode.CALENDAR
-        private var outputType: OutputType = OutputType.BOTH // <--- ברירת מחדל: שניהם
+        private var outputType: OutputType = OutputType.BOTH
         private var onHebrewSelected: ((HebrewDate) -> Unit)? = null
         private var onGregorianSelected: ((LocalDate) -> Unit)? = null
 
         fun setMode(mode: PickerMode) = apply { this.mode = mode }
 
-        /**
-         * מגדיר איזה סוג תאריך יוחזר כאשר יום נבחר.
-         * יש לקרוא לפחות לאחד מהקולבקים (onHebrewSelected או onGregorianSelected).
-         */
         fun setOutputType(type: OutputType) = apply { this.outputType = type }
 
         fun onHebrewSelected(callback: (HebrewDate) -> Unit) = apply { this.onHebrewSelected = callback }
