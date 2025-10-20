@@ -1,4 +1,4 @@
-HebrewDatePicker: בורר תאריך עברי מקיף לאנדרואיד
+HebrewDatePicker: בורר תאריך עברי לאנדרואיד
 
 מינימום SDK
        
