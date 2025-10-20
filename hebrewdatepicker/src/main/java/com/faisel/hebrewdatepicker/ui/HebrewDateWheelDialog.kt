@@ -5,26 +5,24 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.NumberPicker
+import android.widget.TextView
 import com.faisel.hebrewdatepicker.R
 import com.faisel.hebrewdatepicker.model.HebrewDate
 import com.faisel.hebrewdatepicker.utils.DateConverter
+import com.faisel.hebrewdatepicker.utils.HebrewDateUtils
 import com.kosherjava.zmanim.hebrewcalendar.JewishCalendar
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
-/**
- * דיאלוג בורר תאריך עברי באמצעות גלגלות (Wheel/Spinner).
- * מחליף את מצב WHEEL מ-HebrewDatePickerDialog.
- */
+
 class HebrewDateWheelDialog internal constructor(
     context: Context,
+    private val initialDate: Date,
     private val outputType: OutputType,
     private val onHebrewSelected: ((HebrewDate) -> Unit)? = null,
     private val onGregorianSelected: ((LocalDate) -> Unit)? = null
 ) : Dialog(context) {
-
-    private var initialDate: Date = Date()
 
     init {
         setCancelable(true)
@@ -33,17 +31,24 @@ class HebrewDateWheelDialog internal constructor(
     }
 
     private fun setUpWheelUI() {
-        // הנחה: קיים קובץ R.layout.wheel_picker עם ID's: npDay, npMonth, npYear ו-btnWheelOk
         setContentView(R.layout.wheel_picker)
 
         val npDay = findViewById<NumberPicker>(R.id.npDay)
         val npMonth = findViewById<NumberPicker>(R.id.npMonth)
         val npYear = findViewById<NumberPicker>(R.id.npYear)
         val btnOk = findViewById<Button>(R.id.btnWheelOk)
+        val tvHeader = findViewById<TextView>(R.id.tvWheelMonthYear)
 
-        val currentYearHebrew = JewishCalendar(initialDate).jewishYear
-        npYear.minValue = currentYearHebrew - 10
-        npYear.maxValue = currentYearHebrew + 10
+        val initialJc = JewishCalendar(initialDate)
+        val currentYearHebrew = initialJc.jewishYear
+
+        val minYear = currentYearHebrew - 10
+        val maxYear = currentYearHebrew + 10
+        npYear.minValue = minYear
+        npYear.maxValue = maxYear
+
+        val yearsArray = (minYear..maxYear).map { HebrewDateUtils.hebrewYearToGematria(it) }.toTypedArray()
+        npYear.displayedValues = yearsArray
         npYear.value = currentYearHebrew
 
         val hebrewMonths = listOf(
@@ -53,7 +58,7 @@ class HebrewDateWheelDialog internal constructor(
         npMonth.minValue = 1
         npMonth.maxValue = hebrewMonths.size
         npMonth.displayedValues = hebrewMonths.toTypedArray()
-        npMonth.value = JewishCalendar(initialDate).jewishMonth
+        npMonth.value = initialJc.jewishMonth
 
         fun updateDayPicker(year: Int, month: Int) {
             val tempJc = JewishCalendar()
@@ -62,13 +67,20 @@ class HebrewDateWheelDialog internal constructor(
 
             val daysInMonth = tempJc.getDaysInJewishMonth()
 
+            val daysArray = (1..daysInMonth).map { HebrewDateUtils.hebrewDayToGematria(it) }.toTypedArray()
+
+            val oldValue = npDay.value
+
+            npDay.displayedValues = null
             npDay.minValue = 1
             npDay.maxValue = daysInMonth
-            npDay.value = minOf(npDay.value, daysInMonth)
+            npDay.displayedValues = daysArray
+
+            npDay.value = minOf(oldValue, daysInMonth)
         }
 
         updateDayPicker(npYear.value, npMonth.value)
-        npDay.value = JewishCalendar(initialDate).jewishDayOfMonth
+        npDay.value = initialJc.jewishDayOfMonth
 
         npYear.setOnValueChangedListener { _, _, newYear ->
             updateDayPicker(newYear, npMonth.value)
@@ -91,6 +103,8 @@ class HebrewDateWheelDialog internal constructor(
 
             onDateSelected(selectedGregorianDate, selectedHebrewDateModel)
         }
+
+        tvHeader?.text = "${hebrewMonths[initialJc.jewishMonth - 1]} ${HebrewDateUtils.hebrewYearToGematria(currentYearHebrew)}"
     }
 
     private fun onDateSelected(gregorian: LocalDate, hebrew: HebrewDate) {
@@ -105,11 +119,14 @@ class HebrewDateWheelDialog internal constructor(
         dismiss()
     }
 
-
     class Builder(private val context: Context) {
         private var outputType: OutputType = OutputType.BOTH
+        private var initialDate: Date = Date() // ברירת מחדל: היום
         private var onHebrewSelected: ((HebrewDate) -> Unit)? = null
         private var onGregorianSelected: ((LocalDate) -> Unit)? = null
+
+
+        fun setDate(date: Date) = apply { this.initialDate = date }
 
         fun setOutputType(type: OutputType) = apply { this.outputType = type }
 
@@ -118,6 +135,7 @@ class HebrewDateWheelDialog internal constructor(
 
         fun build() = HebrewDateWheelDialog(
             context,
+            initialDate,
             outputType,
             onHebrewSelected,
             onGregorianSelected
