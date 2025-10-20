@@ -14,6 +14,8 @@ import com.kosherjava.zmanim.hebrewcalendar.JewishCalendar
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
+import android.graphics.Color
+import androidx.core.graphics.drawable.toDrawable
 
 
 class HebrewDateWheelDialog internal constructor(
@@ -27,6 +29,7 @@ class HebrewDateWheelDialog internal constructor(
     init {
         setCancelable(true)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         setUpWheelUI()
     }
 
@@ -42,6 +45,45 @@ class HebrewDateWheelDialog internal constructor(
         val initialJc = JewishCalendar(initialDate)
         val currentYearHebrew = initialJc.jewishYear
 
+        val hebrewMonths = listOf(
+            "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול",
+            "תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "אדר ב׳"
+        )
+
+        // מיפוי שמות חודשים לועזיים לעברית לצורך הכותרת
+        val gregorianMonthNamesHebrew = mapOf(
+            "JANUARY" to "ינואר", "FEBRUARY" to "פברואר", "MARCH" to "מרץ",
+            "APRIL" to "אפריל", "MAY" to "מאי", "JUNE" to "יוני",
+            "JULY" to "יולי", "AUGUST" to "אוגוסט", "SEPTEMBER" to "ספטמבר",
+            "OCTOBER" to "אוקטובר", "NOVEMBER" to "נובמבר", "DECEMBER" to "דצמבר"
+        )
+
+        // *** פונקציית עדכון כותרת חדשה ***
+        fun updateHeader(hebrewDay: Int, hebrewMonth: Int, hebrewYear: Int) {
+            val tempJc = JewishCalendar()
+            tempJc.jewishYear = hebrewYear
+            tempJc.jewishMonth = hebrewMonth
+            tempJc.jewishDayOfMonth = hebrewDay
+
+            // חישוב התאריך הלועזי המתאים
+            val gregorianDate = tempJc.gregorianCalendar.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+
+            val hebrewMonthName = hebrewMonths[hebrewMonth - 1]
+            val hebrewYearGematria = HebrewDateUtils.hebrewYearToGematria(hebrewYear)
+
+            // המרת חודש לועזי לעברית
+            val gregorianMonthNameEnglish = gregorianDate.month.name
+            val gregorianMonthHebrew = gregorianMonthNamesHebrew[gregorianMonthNameEnglish] ?: gregorianMonthNameEnglish
+
+            val hebrewLine = "$hebrewMonthName $hebrewYearGematria"
+            val gregorianLine = "${gregorianDate.dayOfMonth} $gregorianMonthHebrew ${gregorianDate.year}"
+
+            tvHeader?.text = "$hebrewLine\n$gregorianLine"
+        }
+
+        // הגדרת בוררי שנה וחודש
         val minYear = currentYearHebrew - 10
         val maxYear = currentYearHebrew + 10
         npYear.minValue = minYear
@@ -51,10 +93,6 @@ class HebrewDateWheelDialog internal constructor(
         npYear.displayedValues = yearsArray
         npYear.value = currentYearHebrew
 
-        val hebrewMonths = listOf(
-            "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול",
-            "תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "אדר ב׳"
-        )
         npMonth.minValue = 1
         npMonth.maxValue = hebrewMonths.size
         npMonth.displayedValues = hebrewMonths.toTypedArray()
@@ -76,19 +114,35 @@ class HebrewDateWheelDialog internal constructor(
             npDay.maxValue = daysInMonth
             npDay.displayedValues = daysArray
 
-            npDay.value = minOf(oldValue, daysInMonth)
+            val newDayValue = minOf(oldValue, daysInMonth)
+            npDay.value = newDayValue
+
+            // קריאה לפונקציית עדכון הכותרת לאחר עדכון הערך
+            updateHeader(newDayValue, month, year)
         }
 
+        // אתחול ראשוני
         updateDayPicker(npYear.value, npMonth.value)
         npDay.value = initialJc.jewishDayOfMonth
+        // קריאה נוספת לאתחול הכותרת לאחר שה-Day Picker הוגדר לחלוטין
+        updateHeader(npDay.value, npMonth.value, npYear.value)
 
+
+        // *** עדכון מאזינים (Listeners) ***
         npYear.setOnValueChangedListener { _, _, newYear ->
             updateDayPicker(newYear, npMonth.value)
+            // updateDayPicker כבר קורא ל-updateHeader
         }
         npMonth.setOnValueChangedListener { _, _, newMonth ->
             updateDayPicker(npYear.value, newMonth)
+            // updateDayPicker כבר קורא ל-updateHeader
+        }
+        npDay.setOnValueChangedListener { _, _, newDay ->
+            // קריאה ישירה לעדכון הכותרת כאשר המשתמש משנה רק את היום
+            updateHeader(newDay, npMonth.value, npYear.value)
         }
 
+        // לוגיקת כפתור אישור (ללא שינוי)
         btnOk.setOnClickListener {
             val selectedJc = JewishCalendar()
             selectedJc.jewishYear = npYear.value
@@ -103,8 +157,6 @@ class HebrewDateWheelDialog internal constructor(
 
             onDateSelected(selectedGregorianDate, selectedHebrewDateModel)
         }
-
-        tvHeader?.text = "${hebrewMonths[initialJc.jewishMonth - 1]} ${HebrewDateUtils.hebrewYearToGematria(currentYearHebrew)}"
     }
 
     private fun onDateSelected(gregorian: LocalDate, hebrew: HebrewDate) {
