@@ -23,13 +23,21 @@ dependencies {
 בפעילות (Activity) או בפרגמנט שבו אתה מציג את הדיאלוג:
 
 import com.faisel.hebrewdatepicker.ui.HebrewDateWheelDialog // אם אתה רוצה ספינר/גלגלת
+
 import com.faisel.hebrewdatepicker.ui.HebrewDatePickerDialog // אם אתה רוצה בורר רגיל
+
 import com.faisel.hebrewdatepicker.ui.OutputType
+
 import com.faisel.hebrewdatepicker.ui.PickerMode
+
 import com.faisel.hebrewdatepicker.model.HebrewDate
+
 import java.time.LocalDate // אם אתה רוצה שיחזיר תאריך גרגוריאני
+
 import java.time.ZoneId // נדרש להמרה ל-Timestamp
+
 import java.time.format.DateTimeFormatter // אם אתה רוצה לשנות את הפורמט של התאריך
+
 
 
 2.2. הפעלת בורר הגלגלת (HebrewDateWheelDialog)
