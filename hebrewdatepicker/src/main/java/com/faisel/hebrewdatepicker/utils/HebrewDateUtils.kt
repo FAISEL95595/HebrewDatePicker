@@ -53,11 +53,21 @@ object HebrewDateUtils {
             }
         }
 
-        val finalString = sb.toString()
-        if (finalString.isEmpty()) return ""
+        val rawGematria = sb.toString()
+        if (rawGematria.isEmpty()) return ""
 
-        val lastChar = finalString.last()
-        val remainder = finalString.substring(0, finalString.length - 1)
+        return if (rawGematria.length == 1) {
+            "$rawGematria׳" // גרש: 'א
+        } else {
+            val lastChar = rawGematria.last()
+            val remainder = rawGematria.substring(0, rawGematria.length - 1)
+            "$remainder״$lastChar"
+        }
+    }
+
+    private fun addGershayim(gematrialString: String): String {
+        val lastChar = gematrialString.last()
+        val remainder = gematrialString.substring(0, gematrialString.length - 1)
 
         return if (remainder.isEmpty()) {
             "$lastChar׳"
@@ -79,44 +89,44 @@ object HebrewDateUtils {
             9 -> "כסלו"
             10 -> "טבת"
             11 -> "שבט"
-            12 -> "אדר א'"
-            13 -> "אדר ב'"
+            12 -> "אדר א׳"
+            13 -> "אדר ב׳"
             else -> "?"
         }
     }
 
     fun hebrewDayToGematria(day: Int): String {
         return when (day) {
-            1 -> "א'"
-            2 -> "ב'"
-            3 -> "ג'"
-            4 -> "ד'"
-            5 -> "ה'"
-            6 -> "ו'"
-            7 -> "ז'"
-            8 -> "ח'"
-            9 -> "ט'"
-            10 -> "י'"
-            11 -> "י\"א"
-            12 -> "י\"ב"
-            13 -> "י\"ג"
-            14 -> "י\"ד"
-            15 -> "ט\"ו"
-            16 -> "ט\"ז"
-            17 -> "י\"ז"
-            18 -> "י\"ח"
-            19 -> "י\"ט"
-            20 -> "כ'"
-            21 -> "כ\"א"
-            22 -> "כ\"ב"
-            23 -> "כ\"ג"
-            24 -> "כ\"ד"
-            25 -> "כ\"ה"
-            26 -> "כ\"ו"
-            27 -> "כ\"ז"
-            28 -> "כ\"ח"
-            29 -> "כ\"ט"
-            30 -> "ל'"
+            1 -> "א׳"
+            2 -> "ב׳"
+            3 -> "ג׳"
+            4 -> "ד׳"
+            5 -> "ה׳"
+            6 -> "ו׳"
+            7 -> "ז׳"
+            8 -> "ח׳"
+            9 -> "ט׳"
+            10 -> "י׳"
+            11 -> "י״א"
+            12 -> "י״ב"
+            13 -> "י״ג"
+            14 -> "י״ד"
+            15 -> "ט״ו"
+            16 -> "ט״ז"
+            17 -> "י״ז"
+            18 -> "י״ח"
+            19 -> "י״ט"
+            20 -> "כ׳"
+            21 -> "כ״א"
+            22 -> "כ״ב"
+            23 -> "כ״ג"
+            24 -> "כ״ד"
+            25 -> "כ״ה"
+            26 -> "כ״ו"
+            27 -> "כ״ז"
+            28 -> "כ״ח"
+            29 -> "כ״ט"
+            30 -> "ל׳"
             else -> day.toString()
         }
     }

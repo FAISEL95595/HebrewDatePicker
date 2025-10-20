@@ -23,7 +23,9 @@ class CalendarAdapter(
     private val style: DatePickerStyle = DatePickerStyle.default()
 ) : BaseAdapter() {
 
-    private val baseDayBackground: Drawable? = ContextCompat.getDrawable(context, R.drawable.day_square_background)
+    // **תיקון: שינוי מ-ContextCompat.getDrawable(...) ל-null כדי למנוע Resource$NotFoundException**
+    // ה-Drawable הפנימי אינו נמצא (ID 0). נגדיר אותו כ-null ונשתמש בהגדרות ה-style כברירת מחדל.
+    private val baseDayBackground: Drawable? = null
 
     override fun getCount(): Int = days.size
     override fun getItem(position: Int): Any? = days[position]
@@ -31,39 +33,38 @@ class CalendarAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val textView = (convertView as? TextView ?: TextView(context).apply {
-            textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-            textSize = style.dayTextSize ?: 14f
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                150
+                parent!!.height / 6
             )
-            setLines(2)
-            style.bodyTypeface?.let { typeface = it }
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            textSize = style.dayTextSize ?: 14f
+            setTypeface(style.bodyTypeface)
         })
 
         val (gregorian, hebrew) = days[position]
 
         if (gregorian != null && hebrew != null) {
-            textView.text = "${gregorian.dayOfMonth}\n${hebrew.dayGematria}"
-            textView.setTextColor(style.dayTextColor ?: Color.BLACK)
-            textView.background = baseDayBackground
+            textView.text = hebrew.dayGematria
+            textView.visibility = View.VISIBLE
 
-            when {
-                gregorian == selectedDate -> {
-                    val color = style.selectedDayBackgroundColor ?: ContextCompat.getColor(context, R.color.blue_default)
-                    textView.background = getStyledBackground(color, style.cornerRadius)
-                    textView.setTextColor(style.selectedDayTextColor ?: Color.WHITE)
-                }
-                gregorian.isEqual(todayDate) -> {
-                    val color = style.todayHighlightColor ?: ContextCompat.getColor(context, R.color.red_default)
-                    textView.background = getStyledBackground(color, style.cornerRadius)
-                    textView.setTextColor(style.headerTextColor ?: Color.BLACK)
-                }
-                else -> {
-                    style.dayBackgroundColor?.let {
-                        textView.background = getStyledBackground(it, style.cornerRadius)
-                    } ?: run {
+            if (gregorian == selectedDate) {
+                val selectedDayColor = style.selectedDayBackgroundColor ?: R.color.blue_default
+                textView.background = getStyledBackground(selectedDayColor, style.cornerRadius)
+                textView.setTextColor(style.selectedDayTextColor ?: Color.WHITE)
+            } else {
+                val isToday = gregorian == todayDate
+                if (isToday) {
+                    val todayColor = style.todayHighlightColor ?: R.color.red_default
+                    textView.background = getStyledBackground(todayColor, style.cornerRadius)
+                    textView.setTextColor(style.dayTextColor ?: Color.BLACK)
+                } else {
+                    if (style.dayBackgroundColor != null) {
+                        textView.background = getStyledBackground(style.dayBackgroundColor, style.cornerRadius)
+                    } else if (baseDayBackground != null) {
                         textView.background = baseDayBackground
+                    } else {
+                        textView.background = null // לוודא שאין רקע אם baseDayBackground הוא null
                     }
                     textView.setTextColor(style.dayTextColor ?: Color.BLACK)
                 }
@@ -99,13 +100,11 @@ class CalendarAdapter(
     private fun dpToPx(dp: Float): Float =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.resources.displayMetrics)
 
+    // שימוש בצבעים מוגדרים כאן כ-Int אם אין משאבי צבע רשמיים בפרויקט
     private object R {
         object color {
             const val blue_default = 0xFF2196F3.toInt()
             const val red_default = 0xFFF44336.toInt()
-        }
-        object drawable {
-            const val day_square_background = 0
         }
     }
 }

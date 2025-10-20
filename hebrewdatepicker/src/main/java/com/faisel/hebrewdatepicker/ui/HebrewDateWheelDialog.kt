@@ -40,10 +40,13 @@ class HebrewDateWheelDialog internal constructor(
     private val minYear = JewishCalendar(Date()).jewishYear - 100
     private val maxYear = JewishCalendar(Date()).jewishYear + 50
 
+    private val hebrewYearsGematria: Array<String> = (minYear..maxYear).map {
+        HebrewDateUtils.hebrewYearToGematria(it)
+    }.toTypedArray()
+
     init {
         setCancelable(true)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        // **תיקון: יישום צבע רקע מהסטייל**
         style.backgroundColor?.let {
             window?.setBackgroundDrawable(ColorDrawable(it))
         } ?: run {
@@ -72,50 +75,49 @@ class HebrewDateWheelDialog internal constructor(
         var currentYearHebrew = initialJc.jewishYear
 
         npMonth.minValue = 1
-        npMonth.maxValue = 13 // מספר המקסימלי של חודשים (כולל אדר א' וב')
+        npMonth.maxValue = 13
         npMonth.displayedValues = hebrewMonths
 
-        npYear.minValue = minYear
-        npYear.maxValue = maxYear
-        npYear.value = currentYearHebrew
+        npYear.minValue = 0
+        npYear.maxValue = hebrewYearsGematria.size - 1
+        npYear.displayedValues = hebrewYearsGematria
+
+        val initialYearIndex = initialJc.jewishYear - minYear
+        npYear.value = initialYearIndex
 
         updateDayPicker(initialJc.jewishYear, initialJc.jewishMonth)
         npDay.value = initialJc.jewishDayOfMonth
 
-        npYear.setOnValueChangedListener { _, _, newVal ->
-            currentYearHebrew = newVal
+        npYear.setOnValueChangedListener { _, _, newIndex ->
+            currentYearHebrew = minYear + newIndex
             updateDayPicker(currentYearHebrew, npMonth.value)
             updateHeader(currentYearHebrew, npMonth.value)
         }
 
         npMonth.setOnValueChangedListener { _, _, newVal ->
-            updateDayPicker(npYear.value, newVal)
-            updateHeader(npYear.value, newVal)
+            updateDayPicker(minYear + npYear.value, newVal)
+            updateHeader(minYear + npYear.value, newVal)
         }
 
-        npDay.setOnValueChangedListener { _, _, newVal ->
-        }
+        npDay.setOnValueChangedListener { _, _, newVal -> }
 
         updateHeader(currentYearHebrew, initialJc.jewishMonth)
 
         btnSelect.setOnClickListener {
             val day = npDay.value
             val month = npMonth.value
-            val year = npYear.value
+            val year = minYear + npYear.value
 
             val selectedJc = JewishCalendar().apply {
                 jewishYear = year
                 jewishMonth = month
                 jewishDayOfMonth = day
             }
-
             val selectedGregorianDate = selectedJc.gregorianCalendar.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
-
-            val selectedHebrewDateModel = DateConverter.gregorianToHebrew(selectedGregorianDate)
-
-            onDateSelected(selectedGregorianDate, selectedHebrewDateModel)
+            val selectedHebrewDate = DateConverter.gregorianToHebrew(selectedGregorianDate)
+            onDateSelected(selectedGregorianDate, selectedHebrewDate)
         }
     }
 
@@ -123,25 +125,16 @@ class HebrewDateWheelDialog internal constructor(
         val jc = JewishCalendar().apply {
             jewishYear = year
             jewishMonth = month
+            jewishDayOfMonth = 1
         }
-
-        val daysInMonth = jc.daysInJewishMonth
-        val dayGematriaList = (1..daysInMonth).map {
-            HebrewDateUtils.hebrewDayToGematria(it)
-        }.toTypedArray()
-
         npDay.minValue = 1
-        npDay.maxValue = daysInMonth
-        npDay.displayedValues = dayGematriaList
-
-        if (npDay.value > daysInMonth) {
-            npDay.value = daysInMonth
-        }
+        npDay.maxValue = jc.daysInJewishMonth
     }
 
     private fun updateHeader(year: Int, month: Int) {
-        val monthName = hebrewMonths.getOrElse(month - 1) { "?" }
-        tvHeader?.text = "$monthName ${HebrewDateUtils.hebrewYearToGematria(year)}"
+        val monthName = HebrewDateUtils.hebrewMonthName(month)
+        val yearGematria = HebrewDateUtils.hebrewYearToGematria(year)
+        tvHeader?.text = "$monthName $yearGematria"
     }
 
     private fun onDateSelected(gregorian: LocalDate, hebrew: HebrewDate) {
@@ -161,21 +154,21 @@ class HebrewDateWheelDialog internal constructor(
         private var initialDate: Date = Date()
         private var onHebrewSelected: ((HebrewDate) -> Unit)? = null
         private var onGregorianSelected: ((LocalDate) -> Unit)? = null
-        private var style: DatePickerStyle = DatePickerStyle.default() // **תיקון: הוספת style**
+        private var style: DatePickerStyle = DatePickerStyle.default()
 
         fun setDate(date: Date) = apply { this.initialDate = date }
         fun setOutputType(type: OutputType) = apply { this.outputType = type }
         fun onHebrewSelected(callback: (HebrewDate) -> Unit) = apply { this.onHebrewSelected = callback }
         fun onGregorianSelected(callback: (LocalDate) -> Unit) = apply { this.onGregorianSelected = callback }
-        fun setStyle(style: DatePickerStyle) = apply { this.style = style } // **תיקון: הוספת setStyle**
+        fun setStyle(style: DatePickerStyle) = apply { this.style = style }
 
         fun build() = HebrewDateWheelDialog(
             context,
             initialDate,
             outputType,
             style,
-            onHebrewSelected ?: {},
-            onGregorianSelected ?: {}
+            onHebrewSelected ?: { _ -> },
+            onGregorianSelected ?: { _ -> }
         )
     }
 }
