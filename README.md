@@ -1,73 +1,204 @@
-📅 Hebrew Date Picker Library
-
-ספריית אנדרואיד (Kotlin) המספקת רכיב Date Picker Dialog לבחירת תאריכים בלוח השנה העברי. הספרייה משלבת את חישובי הזמנים העבריים ומאפשרת למפתחים לקבל את התאריך הנבחר בפורמט עברי ובפורמט גרגוריאני כאחד.
-
-🛠️ טכנולוגיות ותלויות
-
-שפת פיתוח Kotlin
+HebrewDatePicker: בורר תאריך עברי לאנדרואיד
 
 מינימום SDK
-26 ומעלה
+       
+        minSdk = 26
 
-🚀 התקנה
 
-הוסף את התלות בספרייה לקובץ build.gradle.kts:
+ספריית אנדרואיד פשוטה וגמישה המאפשרת בחירה קלה של תכים עבריים או המרתם לתאריך גרגוריאני (לועזי). הספרייה מציעה שתי תצוגות: לוח שנה (לוח שנה) וגלגלת (גלגל/ספינר).
+
+התקנה
+1.1. תלות בגריידל
+וודא שיש לך את jitpack (בקובץ setting.gradel.kts)
+
+```
+maven("https://jitpack.io")
+```
+
+כדי להשתמש בספרייה, הוסף את התלות (תלות) הבאה לקובץ ה-Gradle של המודול שלך app/build.gradle.kts):
+
+```
+// build.gradle.kts (רמת מודול: אפליקציה)
 
 dependencies {
-    implementation("com.github.FAISEL95595:HebrewDatePicker:1.0.0") 
-}
+ implementation("com.github.FAISEL95595:HebrewDatePicker:1.5.1") // גרסה אחרונה כרגע
+ }
+```
 
+שימוש והפעלה (דוגמאות)
+הספרייה מספקת שני דיאלוגים ראשיים: HebrewDateWheelDialog (גלגלת) ו-HebrewDatePickerDialog (לוח שנה).
 
-📖 שימוש (דוגמאות בקוטלין)
+2.1. ייבוא ​​נדרש
 
-1. ייבוא נדרש
+בפעילות (פעילות) או בפרגמנט שבו אתה מציג את הדיאלוג:
 
-import com.faisel.hebrewdatepicker.ui.HebrewDatePickerDialog
+```
+import com.faisel.hebrewdatepicker.ui.HebrewDateWheelDialog // אם אתה רוצה ספינר/גלגלת
+import com.faisel.hebrewdatepicker.ui.HebrewDatePickerDialog // אם אתה רוצה בורר רגיל
 import com.faisel.hebrewdatepicker.ui.OutputType
+import com.faisel.hebrewdatepicker.ui.PickerMode
 import com.faisel.hebrewdatepicker.model.HebrewDate
-import java.time.LocalDate 
+import java.time.LocalDate // אם אתה רוצה שיחזיר תאריך גרגוריאני
+import java.time.ZoneId // נדרש להמרה ל-Timestamp
+import java.time.format.DateTimeFormatter // אם אתה רוצה לשנות את הפורמט של התאריך
 
+```
 
-2. קבלת פלט כפול (OutputType.BOTH)
+2.2. הפעלת בורר הגלגלת (HebrewDateWheelDialog)
 
-כדי לקבל את התאריך העברי (HebrewDate) ואת התאריך הגרגוריאני (LocalDate) לאחר בחירה אחת, הגדר את ה-OutputType ל-BOTH וספק את שני ה-Callbacks:
+הדיאלוג הזה משתמש בתצוגת גלגלים לבחירת יום, חודש ושנה.
 
-fun openDualDatePicker(context: Context) {
-    var hebrewDateOutput: HebrewDate? = null
-    var gregorianDateOutput: LocalDate? = null
-    
-    HebrewDatePickerDialog.Builder(context)
-        .setOutputType(OutputType.BOTH) // מגדיר פלט עברי וגרגוריאני
-
-        .onHebrewSelected { hebrewDate: HebrewDate ->
-            hebrewDateOutput = hebrewDate
-              Toast.makeText(
-                context,  
-                Toast.LENGTH_LONG
-            ).show()
+```
+private fun showHebrewWheelDialog() {
+    // הגדרת תאריך התחלתי (לדוגמה, התאריך שנבחר כרגע או Date())
+    val initialDate = selectedCalendar.time 
+    HebrewDateWheelDialog.Builder(this)
+        .setDate(initialDate) 
+        .setOutputType(OutputType.GREGORIAN) // מחזיר רק תאריך לועזי (LocalDate)
+        .onGregorianSelected { selectedDate ->   
+            // --- אפשרות א: שינוי פורמט התאריך (מחרוזת) ---
+            val formatter = DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy") // לדוגמה: יום, 20/10/2025
+            val formattedDateString = selectedDate.format(formatter)
+            // --- אפשרות ב: קבלת Timestamp ---
+            val timestampInMilliseconds: Long = selectedDate
+                .atStartOfDay(ZoneId.systemDefault()) 
+                .toInstant()
+                .toEpochMilli()
+            // עדכון הממשק
+            binding.tvGregorianDate.text = formattedDateString
+            // ... שמירת ה-Timestamp ...
         }
-        .build()
-        .show()
-        }
-
-        .onGregorianSelected { localDate: LocalDate ->
-            gregorianDateOutput = localDate
-            
-            Toast.makeText(
-                context,  
-                Toast.LENGTH_LONG
-            ).show()
+        .onHebrewSelected { hebrewDate ->
+             // קולבק זה יופעל גם אם OutputType.BOTH מוגדר
+             // hebrewDate מכיל: יום (Int), חודש (Int), שנה (Int), חודש עברי (String)
+             // Toast.makeText(this, "התאריך העברי: ${hebrewDate.hebrewMonthName} ${hebrewDate.hebrewDay}", Toast.LENGTH_SHORT).show()
         }
         .build()
         .show()
 }
+```
 
 
-3. קבלת פלט עברי בלבד (OutputType.HEBREW)
+2.3. הפעלת בורר לוח השנה (HebrewDatePickerDialog)
 
-HebrewDatePickerDialog.Builder(context)
-    .setOutputType(OutputType.HEBREW) 
-    .onHebrewSelected { hebrewDate: HebrewDate ->
-    }
-    .build()
-    .show()
+הדיאלוג הזה משתמש בתצוגת לוח שנה.
+
+```
+private fun showHebrewCalendarDialog() {
+    // שימו לב: HebrewDatePickerDialog דורש גם הגדרת PickerMode
+    HebrewDatePickerDialog.Builder(this)
+        .setMode(PickerMode.CALENDAR)
+        .setOutputType(OutputType.BOTH) // יחזיר גם עברי וגם לועזי
+        // אין אפשרות setDate בפיקר הזה, הוא מתחיל מהתאריך הנוכחי
+        .onGregorianSelected { selectedDate -> 
+            // ... לוגיקה ...
+        }
+        .onHebrewSelected { hebrewDate ->
+             // ... לוגיקה ...
+        }
+        .build()
+        .show()
+}
+```
+
+
+3. מבנה ואפשרויות API מפורטות
+
+3.1. מחלקת OutputType
+
+זהו enum class המגדיר את הפורמט של התוצאה שתחזור מהדיאלוג. יש לקרוא לאחד מהקולבקים המתאימים (onGregorianSelected או onHebrewSelected) בהתאם ל-OutputType שבחרת.
+
+
+
+```
+.setOutputType(OutputType.HEBREW)
+.setOutputType(OutputType.GREGORIAN)
+.setOutputType(OutputType.BOTH)
+```
+
+
+שימוש ב:
+
+```
+HEBREW
+```
+יחזיר רק את התאריך העברי.
+```
+.onHebrewSelected
+com.faisel.hebrewdatepicker.model.HebrewDate
+```
+
+
+שימוש ב:
+
+
+```
+GREGORIAN
+```
+יחזיר רק את התאריך הלועזי.
+```
+.onGregorianSelected
+java.time.LocalDate
+```
+
+שימוש ב:
+
+
+```
+BOTH
+```
+יחזיר את שני סוגי התאריכים.
+אחד או שני הקולבקים
+LocalDate ו-HebrewDate
+
+3.2. מחלקת PickerMode (בשימוש רק ב-HebrewDatePickerDialog)
+
+CALENDAR
+תצוגת לוח שנה חודשי עברי.
+
+4. הקולבקים (Callbacks)
+4.1.
+```
+.onGregorianSelected { selectedDate -> ... }
+```
+מופעל כשהמשתמש מסיים לבחור תאריך. מחזיר אובייקט LocalDate.
+(LocalDate) -> Unit
+GREGORIAN או BOTH
+4.2.
+```
+.onHebrewSelected { hebrewDate -> ... }
+```
+
+מופעל כשהמשתמש מסיים לבחור תאריך. מחזיר מודל HebrewDate.
+(HebrewDate) -> Unit
+HEBREW או BOTH
+
+5. המרת התאריך (גמישות בפורמט ו-Timestamp)
+
+הספרייה מחזירה אובייקטים מובנים (LocalDate ו-HebrewDate), המאפשרים לך לעצב את הפלט כרצונך.
+
+5.1. שליטה מלאה בפורמט ה-String
+
+כדי לשנות את סדר היום/חודש/שנה או את אופן ההצגה (כמו הוספת שם יום או חודש מלא), השתמש ב-DateTimeFormatter בתוך הקולבק:
+
+```
+.onGregorianSelected { selectedDate ->
+    // יום בשבוע מלא, יום נומרי, חודש נומרי, שנה מלאה (לדוגמה: Monday, 20-10-2025)
+    val customFormatter = DateTimeFormatter.ofPattern("EEEE, dd-MM-yyyy") 
+    val dateDisplay = selectedDate.format(customFormatter)
+    // ...
+}
+```
+
+
+5.2. המרה ל-Timestamp (מספר)
+כדי לקבל את התאריך כ-Timestamp (Long - מספר המילישניות מאז $1970$):
+```
+.onGregorianSelected { selectedDate ->
+    val timestampInMilliseconds: Long = selectedDate
+        .atStartOfDay(ZoneId.systemDefault()) // המרת תחילת היום באזור זמן מקומי
+        .toInstant()
+        .toEpochMilli() // התוצאה היא מספר ה-Timestamp
+Toast.makeText(this, "Timestamp: $timestampInMilliseconds", Toast.LENGTH_LONG).show() //דוגמה לקבלת output
+}
+```
