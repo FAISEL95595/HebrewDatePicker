@@ -17,10 +17,11 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.Calendar
 
-class HebrewDatePickerDialog private constructor(
+// *** שינוי קריטי: הקונסטרוקטור שונה מ-private ל-internal ***
+class HebrewDatePickerDialog internal constructor(
     context: Context,
     private val mode: PickerMode,
-    private val outputType: OutputType, // <--- פרמטר חדש
+    private val outputType: OutputType,
     private val onHebrewSelected: ((HebrewDate) -> Unit)? = null,
     private val onGregorianSelected: ((LocalDate) -> Unit)? = null
 ) : Dialog(context) {
@@ -125,7 +126,7 @@ class HebrewDatePickerDialog private constructor(
          * מגדיר איזה סוג תאריך יוחזר כאשר יום נבחר.
          * יש לקרוא לפחות לאחד מהקולבקים (onHebrewSelected או onGregorianSelected).
          */
-        fun setOutputType(type: OutputType) = apply { this.outputType = type } // <--- שיטה חדשה
+        fun setOutputType(type: OutputType) = apply { this.outputType = type }
 
         fun onHebrewSelected(callback: (HebrewDate) -> Unit) = apply { this.onHebrewSelected = callback }
         fun onGregorianSelected(callback: (LocalDate) -> Unit) = apply { this.onGregorianSelected = callback }
@@ -133,7 +134,7 @@ class HebrewDatePickerDialog private constructor(
         fun build() = HebrewDatePickerDialog(
             context,
             mode,
-            outputType, // <--- הוספת הפרמטר החדש
+            outputType,
             onHebrewSelected,
             onGregorianSelected
         )
