@@ -6,6 +6,7 @@
     android:padding="8dp">
 
     <LinearLayout
+        android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -31,15 +32,16 @@
             android:textStyle="bold" />
 
         <ImageButton
-        android:id="@+id/btnNextMonth"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_arrow_back"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="החודש הבא" />
+            android:id="@+id/btnNextMonth"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="החודש הבא" />
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/dayNamesContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -58,10 +60,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numColumns="7"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="4dp"
-        android:horizontalSpacing="4dp"
         android:gravity="center"
-        android:padding="4dp" />
+        android:stretchMode="columnWidth"
+        android:listSelector="@android:color/transparent" />
 
 </LinearLayout>

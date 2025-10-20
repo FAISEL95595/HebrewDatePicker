@@ -48,6 +48,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.zmanim)
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.ui)
+
 }
 
 afterEvaluate {
