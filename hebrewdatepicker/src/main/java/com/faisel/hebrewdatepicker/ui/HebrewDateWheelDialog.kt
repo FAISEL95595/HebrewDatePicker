@@ -37,6 +37,12 @@ class HebrewDateWheelDialog internal constructor(
     private fun setUpWheelUI() {
         setContentView(R.layout.wheel_picker)
 
+        val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0)
+        rootView?.setBackgroundColor(Color.WHITE)
+
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+
         val npDay = findViewById<NumberPicker>(R.id.npDay)
         val npMonth = findViewById<NumberPicker>(R.id.npMonth)
         val npYear = findViewById<NumberPicker>(R.id.npYear)
@@ -80,6 +86,7 @@ class HebrewDateWheelDialog internal constructor(
             tvHeader?.text = "$hebrewLine\n$gregorianLine"
         }
 
+        // הגדרת בוררי שנה וחודש
         val minYear = currentYearHebrew - 10
         val maxYear = currentYearHebrew + 10
         npYear.minValue = minYear
@@ -116,10 +123,10 @@ class HebrewDateWheelDialog internal constructor(
             updateHeader(npDay.value, month, year)
         }
 
-
         npDay.value = initialJc.jewishDayOfMonth
 
         updateDayPicker(npYear.value, npMonth.value)
+
 
 
         npYear.setOnValueChangedListener { _, _, newYear ->
