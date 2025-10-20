@@ -110,10 +110,10 @@ class HebrewDateWheelDialog internal constructor(
             npDay.maxValue = daysInMonth
             npDay.displayedValues = daysArray
 
-            val newDayValue = minOf(oldValue, daysInMonth)
+            val newDayValue = maxOf(1, minOf(oldValue, daysInMonth))
             npDay.value = newDayValue
 
-            updateHeader(newDayValue, month, year)
+            updateHeader(npDay.value, month, year)
         }
 
 
