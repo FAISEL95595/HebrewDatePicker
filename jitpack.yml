@@ -1,12 +1,12 @@
 before_install:
-  # התקנה ושימוש בגרסה ספציפית של Java 17
+  # התקנה ושימוש בגרסה ספציפית של Java 17 (נדרש על ידי Gradle שלך)
   - sdk install java 17.0.8-tem
   - sdk use java 17.0.8-tem
 
 install:
-  # הרצת הבנייה
+  # הרצת הבנייה על מודול hebrewdatepicker
   - ./gradlew :hebrewdatepicker:assembleRelease
 
-# הוראה ל-JitPack היכן למצוא את הספרייה הסופית (ה-AAR)
+# הפניה לקובץ ה-AAR שנוצר
 artifacts:
   - hebrewdatepicker/build/outputs/aar/hebrewdatepicker-release.aar
