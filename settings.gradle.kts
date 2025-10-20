@@ -20,5 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "hebrewdatepicker"
-include(":app")
 include(":hebrewdatepicker")
