@@ -16,7 +16,7 @@
             android:id="@+id/btnPrevMonth"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_arrow_back"
+            android:src="@drawable/ic_arrow_forward"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="החודש הקודם" />
 
@@ -34,7 +34,7 @@
         android:id="@+id/btnNextMonth"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_arrow_forward"
+        android:src="@drawable/ic_arrow_back"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="החודש הבא" />
     </LinearLayout>
