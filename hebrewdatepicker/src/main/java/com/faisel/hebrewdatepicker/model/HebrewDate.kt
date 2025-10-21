@@ -7,22 +7,42 @@ data class HebrewDate(
     val month: Int,
     val year: Int
 ) {
+    private val isLeapYear: Boolean
+        get() = HebrewDateUtils.isHebrewLeapYear(year)
+
     val monthName: String
-        get() = when(month) {
-            1 -> "ניסן"
-            2 -> "אייר"
-            3 -> "סיוון"
-            4 -> "תמוז"
-            5 -> "אב"
-            6 -> "אלול"
-            7 -> "תשרי"
-            8 -> "חשוון"
-            9 -> "כסלו"
-            10 -> "טבת"
-            11 -> "שבט"
-            12 -> "אדר א'"
-            13 -> "אדר ב'"
-            else -> "?"
+        get() = when {
+            isLeapYear -> when (month) {
+                1 -> "ניסן"
+                2 -> "אייר"
+                3 -> "סיוון"
+                4 -> "תמוז"
+                5 -> "אב"
+                6 -> "אלול"
+                7 -> "תשרי"
+                8 -> "חשוון"
+                9 -> "כסלו"
+                10 -> "טבת"
+                11 -> "שבט"
+                12 -> "אדר א'"
+                13 -> "אדר ב'"
+                else -> "?"
+            }
+            else -> when (month) {
+                1 -> "ניסן"
+                2 -> "אייר"
+                3 -> "סיוון"
+                4 -> "תמוז"
+                5 -> "אב"
+                6 -> "אלול"
+                7 -> "תשרי"
+                8 -> "חשוון"
+                9 -> "כסלו"
+                10 -> "טבת"
+                11 -> "שבט"
+                12 -> "אדר"
+                else -> "?"
+            }
         }
 
     val dayGematria: String

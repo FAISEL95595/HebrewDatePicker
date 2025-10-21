@@ -66,7 +66,9 @@ object HebrewDateUtils {
         }
     }
 
-
+    fun isHebrewLeapYear(year: Int): Boolean {
+        return ((7 * year + 1) % 19) < 7
+    }
     fun hebrewDayToGematria(day: Int): String {
         val dayMap = listOf(
             "", "א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ז׳", "ח׳", "ט׳",

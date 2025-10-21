@@ -53,10 +53,9 @@ class HebrewDateWheelDialog internal constructor(
         val initialJc = JewishCalendar(initialDate)
         val currentYearHebrew = initialJc.jewishYear
 
-        val hebrewMonths = listOf(
-            "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול",
-            "תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "אדר ב׳"
-        )
+        val hebrewMonths = (1..13).map { monthIndex ->
+            HebrewDate(day = 1, month = monthIndex, year = 5780).monthName
+        }
 
         val gregorianMonthNamesHebrew = mapOf(
             "JANUARY" to "ינואר", "FEBRUARY" to "פברואר", "MARCH" to "מרץ",
