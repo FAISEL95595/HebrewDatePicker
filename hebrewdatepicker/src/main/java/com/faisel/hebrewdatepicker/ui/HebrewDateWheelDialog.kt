@@ -11,6 +11,7 @@ import com.faisel.hebrewdatepicker.model.HebrewDate
 import com.faisel.hebrewdatepicker.utils.DateConverter
 import com.faisel.hebrewdatepicker.utils.HebrewDateUtils
 import com.kosherjava.zmanim.hebrewcalendar.JewishCalendar
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -64,6 +65,16 @@ class HebrewDateWheelDialog internal constructor(
             "OCTOBER" to "אוקטובר", "NOVEMBER" to "נובמבר", "DECEMBER" to "דצמבר"
         )
 
+        val dayOfWeekNamesHebrew = mapOf(
+            DayOfWeek.SUNDAY to "ראשון",
+            DayOfWeek.MONDAY to "שני",
+            DayOfWeek.TUESDAY to "שלישי",
+            DayOfWeek.WEDNESDAY to "רביעי",
+            DayOfWeek.THURSDAY to "חמישי",
+            DayOfWeek.FRIDAY to "שישי",
+            DayOfWeek.SATURDAY to "שבת"
+        )
+
         fun updateHeader(hebrewDay: Int, hebrewMonth: Int, hebrewYear: Int) {
             val tempJc = JewishCalendar()
             tempJc.jewishYear = hebrewYear
@@ -74,16 +85,24 @@ class HebrewDateWheelDialog internal constructor(
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
 
+            val dayOfWeekEnglish = gregorianDate.dayOfWeek
+            val dayOfWeekHebrew = dayOfWeekNamesHebrew[dayOfWeekEnglish] ?: ""
+
             val hebrewMonthName = hebrewMonths[hebrewMonth - 1]
             val hebrewYearGematria = HebrewDateUtils.hebrewYearToGematria(hebrewYear)
 
             val gregorianMonthNameEnglish = gregorianDate.month.name
             val gregorianMonthHebrew = gregorianMonthNamesHebrew[gregorianMonthNameEnglish] ?: gregorianMonthNameEnglish
 
-            val hebrewLine = "$hebrewMonthName $hebrewYearGematria"
-            val gregorianLine = "${gregorianDate.dayOfMonth} $gregorianMonthHebrew ${gregorianDate.year}"
+            // --- השינוי הוא כאן: הסרת הרווח לפני הסוגר הפותח ---
+            val gregorianMonthNumber = gregorianDate.monthValue // 1-12
+            // שינוי פורמט: "שם חודש(מספר)"
+            val formattedGregorianMonth = "$gregorianMonthHebrew($gregorianMonthNumber)"
 
-            tvHeader?.text = "$hebrewLine\n$gregorianLine"
+            val hebrewLine = "$hebrewMonthName $hebrewYearGematria"
+            val gregorianLine = "${gregorianDate.dayOfMonth} $formattedGregorianMonth ${gregorianDate.year}" // שימוש ב-formattedGregorianMonth
+
+            tvHeader?.text = "$dayOfWeekHebrew\n$hebrewLine\n$gregorianLine"
         }
 
         val minYear = currentYearHebrew - 10
