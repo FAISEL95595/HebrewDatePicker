@@ -1,6 +1,7 @@
 package com.faisel.hebrewdatepicker.utils
 
 import java.lang.StringBuilder
+import com.kosherjava.zmanim.hebrewcalendar.JewishCalendar
 
 object HebrewDateUtils {
 
@@ -67,8 +68,11 @@ object HebrewDateUtils {
     }
 
     fun isHebrewLeapYear(year: Int): Boolean {
-        return ((7 * year + 1) % 19) < 7
+        val jewishCalendar = JewishCalendar()
+        jewishCalendar.jewishYear = year
+        return jewishCalendar.isJewishLeapYear
     }
+
     fun hebrewDayToGematria(day: Int): String {
         val dayMap = listOf(
             "", "א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ז׳", "ח׳", "ט׳",
