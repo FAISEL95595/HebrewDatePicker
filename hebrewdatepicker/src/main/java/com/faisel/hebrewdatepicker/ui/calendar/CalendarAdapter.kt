@@ -17,7 +17,7 @@ class CalendarAdapter(
     private val onDayClick: ((LocalDate, HebrewDate) -> Unit)? = null
 ) : BaseAdapter() {
 
-    private val dayBackground = ContextCompat.getDrawable(context, R.drawable.day_square_background)
+    private val dayBackground = ContextCompat.getDrawable(context, R.drawable.square_background)
 
     override fun getCount(): Int = days.size
     override fun getItem(position: Int): Any? = days[position]
