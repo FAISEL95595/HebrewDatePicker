@@ -42,8 +42,7 @@ class CalendarAdapter(
             textView.text = "${gregorian.dayOfMonth}\n${hebrew.dayGematria}"
             if (gregorian == today) {
                 textView.background = todayHighlightBackground
-                textView.setBackgroundColor(Color.RED)
-                textView.setTextColor(Color.WHITE)
+                textView.setTextColor(Color.RED)
             } else {
                 textView.background = dayBackground
                 textView.setTextColor(Color.BLACK)
