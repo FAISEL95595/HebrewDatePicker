@@ -10,16 +10,26 @@ import androidx.core.content.ContextCompat
 import com.faisel.hebrewdatepicker.R
 import com.faisel.hebrewdatepicker.model.HebrewDate
 import java.time.LocalDate
+import android.graphics.drawable.Drawable
 
 class CalendarAdapter(
     private val context: Context,
     private var days: List<Pair<LocalDate?, HebrewDate?>>,
     private val today: LocalDate,
+    private val specialDatesMap: Map<Pair<Int, Int>, Int>,
     private val onDayClick: ((LocalDate, HebrewDate) -> Unit)? = null
 ) : BaseAdapter() {
 
     private val dayBackground = ContextCompat.getDrawable(context, R.drawable.square_background)
     private val todayHighlightBackground = ContextCompat.getDrawable(context, R.drawable.today_highlight)
+
+    private val specialDateDrawables = mutableMapOf<Int, Drawable?>()
+
+    init {
+        specialDatesMap.values.distinct().forEach { resId ->
+            specialDateDrawables[resId] = ContextCompat.getDrawable(context, resId)
+        }
+    }
 
     override fun getCount(): Int = days.size
     override fun getItem(position: Int): Any? = days[position]
@@ -40,7 +50,20 @@ class CalendarAdapter(
 
         if (gregorian != null && hebrew != null) {
             textView.text = "${gregorian.dayOfMonth}\n${hebrew.dayGematria}"
-            if (gregorian == today) {
+
+            val hebrewMonthDay = Pair(hebrew.month, hebrew.day)
+            val specialDrawableId = specialDatesMap[hebrewMonthDay]
+
+            if (specialDrawableId != null) {
+                textView.background = specialDateDrawables[specialDrawableId]
+
+                if (gregorian == today) {
+                    textView.setTextColor(Color.RED)
+                } else {
+                    textView.setTextColor(Color.BLACK)
+                }
+
+            } else if (gregorian == today) {
                 textView.background = todayHighlightBackground
                 textView.setTextColor(Color.RED)
             } else {

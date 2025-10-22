@@ -25,6 +25,41 @@ class HebrewDatePickerDialog internal constructor(
     private val onGregorianSelected: ((LocalDate) -> Unit)? = null
 ) : Dialog(context) {
 
+    companion object {
+        private val special_dates: Map<Pair<Int, Int>, Int> = mapOf(
+            //תשרי
+            Pair(7, 1) to R.drawable.chag_highlight,
+            Pair(7, 2) to R.drawable.chag_highlight,
+            Pair(7, 10) to R.drawable.chag_highlight,
+            Pair(7, 15) to R.drawable.chag_highlight,
+            Pair(7, 16) to R.drawable.moed_highlight,
+            Pair(7, 17) to R.drawable.moed_highlight,
+            Pair(7, 18) to R.drawable.moed_highlight,
+            Pair(7, 19) to R.drawable.moed_highlight,
+            Pair(7, 20) to R.drawable.moed_highlight,
+            Pair(7, 21) to R.drawable.moed_highlight,
+            Pair(7, 22) to R.drawable.chag_highlight,
+            //אדר
+            Pair(12, 14) to R.drawable.moed_highlight,
+            Pair(12, 15) to R.drawable.moed_highlight,
+            Pair(13, 14) to R.drawable.moed_highlight,
+            Pair(13, 15) to R.drawable.moed_highlight,
+            //ניסן
+            Pair(1, 15) to R.drawable.chag_highlight,
+            Pair(1, 16) to R.drawable.moed_highlight,
+            Pair(1, 17) to R.drawable.moed_highlight,
+            Pair(1, 18) to R.drawable.moed_highlight,
+            Pair(1, 19) to R.drawable.moed_highlight,
+            Pair(1, 20) to R.drawable.moed_highlight,
+            Pair(1, 21) to R.drawable.chag_highlight,
+            //אייר
+            Pair(2, 14) to R.drawable.moed_highlight,
+            Pair(2, 18) to R.drawable.moed_highlight,
+            //סיוון
+            Pair(3, 6) to R.drawable.chag_highlight
+        )
+    }
+
     private var currentHebrewMonthCalendar: JewishCalendar = JewishCalendar(Date())
 
     init {
@@ -83,7 +118,7 @@ class HebrewDatePickerDialog internal constructor(
             }
             val today = LocalDate.now(ZoneId.systemDefault())
 
-            val adapter = CalendarAdapter(context, days, today) { gregorian, hebrew ->
+            val adapter = CalendarAdapter(context, days, today, special_dates) { gregorian, hebrew ->
                 when (outputType) {
                     OutputType.HEBREW -> onHebrewSelected?.invoke(hebrew)
                     OutputType.GREGORIAN -> onGregorianSelected?.invoke(gregorian)
