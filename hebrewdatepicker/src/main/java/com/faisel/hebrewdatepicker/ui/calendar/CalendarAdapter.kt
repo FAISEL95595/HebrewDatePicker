@@ -14,10 +14,12 @@ import java.time.LocalDate
 class CalendarAdapter(
     private val context: Context,
     private var days: List<Pair<LocalDate?, HebrewDate?>>,
+    private val today: LocalDate,
     private val onDayClick: ((LocalDate, HebrewDate) -> Unit)? = null
 ) : BaseAdapter() {
 
     private val dayBackground = ContextCompat.getDrawable(context, R.drawable.square_background)
+    private val todayHighlightBackground = ContextCompat.getDrawable(context, R.drawable.today_highlight)
 
     override fun getCount(): Int = days.size
     override fun getItem(position: Int): Any? = days[position]
@@ -38,9 +40,14 @@ class CalendarAdapter(
 
         if (gregorian != null && hebrew != null) {
             textView.text = "${gregorian.dayOfMonth}\n${hebrew.dayGematria}"
-            textView.setTextColor(Color.BLACK)
-
-            textView.background = dayBackground
+            if (gregorian == today) {
+                textView.background = todayHighlightBackground
+                textView.setBackgroundColor(Color.RED)
+                textView.setTextColor(Color.WHITE)
+            } else {
+                textView.background = dayBackground
+                textView.setTextColor(Color.BLACK)
+            }
 
             textView.setOnClickListener {
                 onDayClick?.invoke(gregorian, hebrew)

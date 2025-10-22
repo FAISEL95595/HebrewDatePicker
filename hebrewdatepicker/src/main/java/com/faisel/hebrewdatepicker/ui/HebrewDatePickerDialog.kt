@@ -81,8 +81,9 @@ class HebrewDatePickerDialog internal constructor(
 
                 currentDate = currentDate.plusDays(1)
             }
+            val today = LocalDate.now(ZoneId.systemDefault())
 
-            val adapter = CalendarAdapter(context, days) { gregorian, hebrew ->
+            val adapter = CalendarAdapter(context, days, today) { gregorian, hebrew ->
                 when (outputType) {
                     OutputType.HEBREW -> onHebrewSelected?.invoke(hebrew)
                     OutputType.GREGORIAN -> onGregorianSelected?.invoke(gregorian)
