@@ -41,7 +41,7 @@ class CalendarAdapter(
             textSize = 14f
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                150
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
             setLines(2)
         }
